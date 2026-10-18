@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Sugar Gravel 2026 — Finish Times</title>
+<meta name="description" content="Finish-time distributions, age-group medians and where riders came from for the 2026 Life Time Big Sugar Gravel 50, 100 and 100 elite.">
+<meta property="og:title" content="Big Sugar Gravel 2026 — Finish Times">
+<meta property="og:description" content="Finish-time distributions, age-group medians and rider home states for the 50, 100 and 100 elite.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='14' width='5' height='14' rx='2' fill='%233987e5'/%3E%3Crect x='13.5' y='6' width='5' height='22' rx='2' fill='%23d95926'/%3E%3Crect x='23' y='18' width='5' height='10' rx='2' fill='%23199e70'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="dash.js"></script>
+</head>
+<body>
+<main id="dash-root">
+<style>
+.bs { font-family: var(--font-anthropic-sans); color: var(--color-fg); display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.bs-head { display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+.bs-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; line-height: 1.2; }
+.bs-lede { margin: 0; font-size: var(--cds-font-size-body); color: var(--color-fg-muted); max-width: 52rem; line-height: 1.5; }
+.bs-lede b, .bs-kpi b { font-weight: 500; color: var(--color-fg); font-variant-numeric: tabular-nums; }
+.bs-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--cds-gap-md); }
+.bs-ctl { display: flex; flex-direction: column; gap: var(--cds-gap-xs); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.bs-seg { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; background: var(--color-panel); }
+.bs-seg button { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: transparent; border: 0; padding: var(--cds-pad-xs) var(--cds-pad-md); cursor: pointer; }
+.bs-seg button + button { border-left: 1px solid var(--color-border-line); }
+.bs-seg button[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); }
+.bs-seg.bs-small button { font-size: var(--cds-font-size-caption); padding: var(--cds-pad-xs) var(--cds-pad-sm); }
+.bs-select { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); min-width: 10rem; }
+.bs-reset { font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); background: none; border: 0; padding: var(--cds-pad-xs) 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.bs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: var(--cds-gap-md); }
+.bs-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+.bs-kpi-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.bs-kpi-value { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.15; white-space: nowrap; }
+.bs-kpi-sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.bs-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.bs-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: var(--cds-gap-sm); }
+.bs-card h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.bs-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; line-height: 1.45; }
+.bs-chart { position: relative; width: 100%; min-height: 220px; }
+.bs-chart svg { display: block; overflow: visible; }
+.bs-chart text { font-family: var(--font-anthropic-sans); }
+.bs-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.bs-legend span { display: inline-flex; align-items: center; gap: var(--cds-gap-xs); }
+.bs-sw { width: 0.625rem; height: 0.625rem; border-radius: 50%; display: inline-block; }
+.bs-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; white-space: nowrap; z-index: 2; }
+.bs-tip-head { color: var(--cds-text-secondary); margin-bottom: 2px; }
+.bs-tip-line { display: flex; align-items: center; gap: var(--cds-gap-xs); }
+.bs-empty { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); padding: var(--cds-pad-lg) 0; }
+.bs-table-wrap { overflow-x: auto; }
+.bs-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); font-variant-numeric: tabular-nums; }
+.bs-table th { font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); text-align: right; padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.bs-table td { text-align: right; padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.bs-table th:first-child, .bs-table td:first-child { text-align: left; }
+.bs-table tbody tr { cursor: pointer; }
+.bs-table tbody tr:hover td { background: var(--cds-chart-grid); }
+.bs-table tbody tr.is-picked td { font-weight: 500; background: var(--cds-chart-grid); }
+.bs-table tbody tr.is-total td { font-weight: 500; }
+.bs-tabs { display: flex; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); overflow-x: auto; }
+.bs-tabs button { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg-muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+.bs-tabs button[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: 500; }
+.bs-scroll { max-height: 26rem; overflow: auto; }
+.bs-scroll thead th { position: sticky; top: 0; background: var(--color-panel); z-index: 1; }
+.bs-barcell { display: flex; align-items: center; justify-content: flex-end; gap: var(--cds-gap-sm); }
+.bs-bar { display: block; height: 8px; border-radius: 4px; flex: none; }
+.bs-otable tbody tr { cursor: default; }
+.bs-otable td.bs-intl { color: var(--color-fg); }
+.bs-otable .bs-tag { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-left: var(--cds-gap-xs); }
+.bs-foot { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.5; margin: 0; max-width: 52rem; }
+.bs-hit { cursor: pointer; }
+[data-dash-source-state=empty] { color: transparent; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+.bs-failed { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: 220px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.bs-failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+</style>
+
+<div class="bs">
+  <header class="bs-head" id="overview">
+    <h1 class="bs-title">Big Sugar Gravel finish times</h1>
+    <p class="bs-lede" id="takeaway">
+      <span class="bs-seg-name"></span>:
+      <b class="dash-skeleton" data-source="segments" data-field="n" id="lede-n">—</b> finishers, median
+      <b class="dash-skeleton" data-source="segments" data-field="median_t" id="lede-med">—</b>. The middle half crossed the line between
+      <b class="dash-skeleton" data-source="segments" data-field="p25_t" id="lede-p25">—</b> and
+      <b class="dash-skeleton" data-source="segments" data-field="p75_t" id="lede-p75">—</b>.<span id="lede-gap" hidden> That median is
+      <b data-source="segments" data-field="median_gap_t" id="lede-gapt">—</b>
+      <span data-source="segments" data-field="median_gap_dir" id="lede-gapd">—</span> than the whole field’s.</span>
+    </p>
+  </header>
+
+  <nav class="bs-tabs" role="tablist" aria-label="Race">
+    <button type="button" role="tab" id="50-mile" data-r="50">50 mile</button><button type="button" role="tab" id="100-mile" data-r="100">100 mile</button><button type="button" role="tab" id="100-elite" data-r="100E">100 mile elite</button>
+  </nav>
+
+  <div class="bs-filters" id="filters">
+    <div class="bs-ctl">Riders
+      <div class="bs-seg bs-gender" role="group" aria-label="Gender">
+        <button type="button" data-g="all">All</button><button type="button" data-g="F">Women</button><button type="button" data-g="M">Men</button>
+      </div>
+    </div>
+    <label class="bs-ctl">UCI age group
+      <select class="bs-select bs-age" aria-label="UCI age group" data-source="segments"></select>
+    </label>
+    <button type="button" class="bs-reset">Reset filters</button>
+  </div>
+
+  <section class="bs-kpis" id="headline">
+    <div class="bs-kpi"><span class="bs-kpi-label">Finishers</span>
+      <span class="bs-kpi-value dash-skeleton" data-source="segments" data-field="n" id="k-n">—</span>
+      <span class="bs-kpi-sub"><span data-source="segments" data-field="starters" id="k-start">—</span> starters</span></div>
+    <div class="bs-kpi"><span class="bs-kpi-label">Fastest</span>
+      <span class="bs-kpi-value dash-skeleton" data-source="segments" data-field="fastest_t" id="k-fast">—</span>
+      <span class="bs-kpi-sub">Slowest <span data-source="segments" data-field="slowest_t" id="k-slow">—</span></span></div>
+    <div class="bs-kpi"><span class="bs-kpi-label">Median</span>
+      <span class="bs-kpi-value dash-skeleton" data-source="segments" data-field="median_t" id="k-med">—</span>
+      <span class="bs-kpi-sub">Mean <span data-source="segments" data-field="mean_t" id="k-mean">—</span></span></div>
+    <div class="bs-kpi"><span class="bs-kpi-label">Middle 50%</span>
+      <span class="bs-kpi-value dash-skeleton" data-source="segments" data-field="iqr_t" id="k-iqr">—</span>
+      <span class="bs-kpi-sub"><span data-source="segments" data-field="p25_t" id="k-p25">—</span> to <span data-source="segments" data-field="p75_t" id="k-p75">—</span></span></div>
+    <div class="bs-kpi"><span class="bs-kpi-label">Did not finish</span>
+      <span class="bs-kpi-value dash-skeleton" data-source="segments" data-field="dnf_rate_t" id="k-dnfr">—</span>
+      <span class="bs-kpi-sub"><span data-source="segments" data-field="dnf" id="k-dnf">—</span> riders</span></div>
+  </section>
+
+  <section class="bs-card" id="histogram">
+    <div class="bs-card-head">
+      <div>
+        <h2>Finish time distribution</h2>
+        <p class="bs-note" id="hist-note">Riders per time bin. Hover or tap a bar for its count and how many had finished by then.</p>
+      </div>
+      <div class="bs-filters">
+        <div class="bs-ctl">Bin
+          <div class="bs-seg bs-small bs-bin" role="group" aria-label="Bin size">
+            <button type="button" data-b="10">10 min</button><button type="button" data-b="15">15 min</button><button type="button" data-b="30">30 min</button>
+          </div>
+        </div>
+        <div class="bs-ctl">Show
+          <div class="bs-seg bs-small bs-ymode" role="group" aria-label="Y axis">
+            <button type="button" data-y="count">Riders</button><button type="button" data-y="share">% of group</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bs-chart dash-skeleton" id="hist-chart" data-source="results"></div>
+  </section>
+
+  <section class="bs-card" id="by-age">
+    <div class="bs-card-head">
+      <div>
+        <h2>Median and spread by UCI age group</h2>
+        <p class="bs-note">Dot is the median, thick bar the middle 50%, thin line fastest to slowest. Dashed line is the whole field’s median. Tap a row to filter.</p>
+      </div>
+      <div class="bs-legend" id="range-legend"></div>
+    </div>
+    <div class="bs-chart dash-skeleton" id="range-chart" data-source="segments"></div>
+  </section>
+
+  <section class="bs-card" id="table">
+    <div class="bs-card-head">
+      <div>
+        <h2 id="table-title">Finish times by age group</h2>
+        <p class="bs-note">Tap a row to filter the page to that group.</p>
+      </div>
+    </div>
+    <div class="bs-table-wrap">
+      <table class="bs-table" data-source="segments" data-row-key="key">
+        <thead><tr>
+          <th data-field="group_label">Age group</th>
+          <th data-field="n">Finishers</th>
+          <th data-field="dnf">DNF</th>
+          <th data-field="fastest_t">Fastest</th>
+          <th data-field="p25_t">25th pct</th>
+          <th data-field="median_t">Median</th>
+          <th data-field="p75_t">75th pct</th>
+          <th data-field="slowest_t">Slowest</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="bs-card" id="origins">
+    <div class="bs-card-head">
+      <div>
+        <h2>Where riders come from</h2>
+        <p class="bs-note" id="origin-lede">Riders came from
+          <b class="dash-skeleton" data-source="segments" data-field="n_states" id="o-states">—</b> <span id="o-states-word">states</span><span id="o-intl-wrap"> and
+          <b data-source="segments" data-field="n_countries" id="o-countries">—</b> <span id="o-countries-word">other countries</span>;
+          <b data-source="segments" data-field="intl" id="o-intl">—</b> (<span data-source="segments" data-field="intl_share_t" id="o-intlsh">—</span>) were international</span>.
+          The largest group came from <b data-source="segments" data-field="top_origin" id="o-top">—</b>
+          (<span data-source="segments" data-field="top_origin_share_t" id="o-topsh">—</span>).</p>
+      </div>
+      <div class="bs-seg bs-small bs-oview" role="group" aria-label="Show riders from">
+        <button type="button" data-o="all">All</button><button type="button" data-o="US">US</button><button type="button" data-o="International">International</button>
+      </div>
+    </div>
+    <div class="bs-table-wrap bs-scroll">
+      <table class="bs-table bs-otable" data-source="origins" data-row-key="key">
+        <thead><tr>
+          <th data-field="origin">State or country</th>
+          <th data-field="riders">Riders</th>
+          <th data-field="share_t">Share</th>
+          <th data-field="finishers">Finishers</th>
+          <th data-field="median_t">Median time</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="bs-note" id="origin-empty" hidden>No riders from outside the US in this group.</p>
+  </section>
+
+  <p class="bs-foot" id="notes">Age groups follow the UCI gravel and gran fondo bands: 19–34, then five-year groups. UCI counts age on December 31; Athlinks gives race-day age, so a rider with a birthday between race day and year-end may sit one group younger here. Under 19 is not a UCI qualifying group. Non-binary finishers (one each in the 50 and 100) are counted under All. The elite men and women raced as separate courses and are combined in the elite tab. DNF riders are excluded from every time statistic. Home state or country is what riders entered at registration; Puerto Rico and DC count as US but not as states.</p>
+</div>
+
+<script>
+const GROUPS = ['Under 19', '19–34', '35–39', '40–44', '45–49', '50–54', '55–59', '60–64', '65–69', '70–74', '75–79', '80+'];
+
+dash.calc('segments', {
+  inputs: ['results'],
+  title: 'Finish-time stats by segment',
+  description: 'For each race (50 mile, 100 mile, 100 mile elite), for all riders, women and men, overall and by UCI age group: starters, finishers, DNFs, how many states and other countries riders came from, the international count and share, the most common home state or country, and fastest, 25th percentile, median, mean, 75th percentile and slowest finish times (finishers only).',
+  fn: (results) => {
+    const races = ['50', '100', '100E'];
+    const groups = ['Under 19', '19–34', '35–39', '40–44', '45–49', '50–54', '55–59', '60–64', '65–69', '70–74', '75–79', '80+'];
+    const genders = [['all', 'All riders'], ['F', 'Women'], ['M', 'Men']];
+    const hms = (s) => { s = Math.round(s); return `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
+    const short = (s) => { const t = hms(s); return t.startsWith('0:') ? t.slice(2).replace(/^0(?=\d)/, '') : t; };
+    const q = (v, p) => { const i = (v.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return v[lo] + (v[hi] - v[lo]) * (i - lo); };
+    const out = [];
+    for (const race of races) for (const [g, gl] of genders) for (const a of ['all', ...groups]) {
+      const rs = results.filter((r) => r.race === race && (g === 'all' || r.gender === g) && (a === 'all' || r.age_group === a));
+      if (!rs.length) continue;
+      const t = rs.filter((r) => r.status === 'Finished' && r.time_sec != null).map((r) => Number(r.time_sec)).sort((x, y) => x - y);
+      const dnf = rs.filter((r) => r.status === 'DNF').length;
+      const row = { key: `${race}|${g}|${a}`, race, gender: g, gender_label: gl, age_group: a, group_label: a === 'all' ? 'All ages' : a,
+        starters: rs.length, n: t.length, dnf, dnf_rate_t: (100 * dnf / rs.length).toFixed(1) + '%' };
+      const intl = rs.filter((r) => r.origin_type !== 'US');
+      const cnt = new Map(); for (const r of rs) cnt.set(r.origin, (cnt.get(r.origin) || 0) + 1);
+      const top = [...cnt].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0];
+      Object.assign(row, {
+        n_states: new Set(rs.filter((r) => r.origin_type === 'US' && r.origin !== 'District of Columbia' && r.origin !== 'Puerto Rico').map((r) => r.origin)).size,
+        n_countries: new Set(intl.map((r) => r.origin)).size, intl: intl.length, intl_share_t: (100 * intl.length / rs.length).toFixed(1) + '%',
+        top_origin: top[0], top_origin_share_t: (100 * top[1] / rs.length).toFixed(1) + '%' });
+      if (t.length) {
+        const p25 = q(t, 0.25), med = q(t, 0.5), p75 = q(t, 0.75), mean = t.reduce((s, v) => s + v, 0) / t.length;
+        Object.assign(row, { fastest_sec: t[0], p25_sec: p25, median_sec: med, mean_sec: mean, p75_sec: p75, slowest_sec: t[t.length - 1],
+          fastest_t: hms(t[0]), p25_t: hms(p25), median_t: hms(med), mean_t: hms(mean), p75_t: hms(p75), slowest_t: hms(t[t.length - 1]), iqr_t: short(p75 - p25) });
+      }
+      out.push(row);
+    }
+    const base = Object.fromEntries(races.map((race) => [race, (out.find((r) => r.key === `${race}|all|all`) || {}).median_sec]));
+    for (const r of out) if (r.median_sec != null) {
+      const d = r.median_sec - base[r.race];
+      r.median_gap_t = short(Math.abs(d));
+      r.median_gap_dir = d > 0 ? 'slower' : d < 0 ? 'faster' : 'no different';
+    }
+    return out;
+  },
+});
+
+dash.calc('origins', {
+  inputs: ['results'],
+  title: 'Riders by home state or country',
+  description: 'For each race, gender and UCI age group (or all of them): riders from each US state or other country, their share of the group, finishers, and median finish time of those finishers.',
+  fn: (results) => {
+    const hms = (s) => { s = Math.round(s); return `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
+    const q = (v, p) => { const i = (v.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return v[lo] + (v[hi] - v[lo]) * (i - lo); };
+    const groups = new Map(), totals = new Map();
+    for (const r of results) for (const g of ['all', r.gender]) for (const a of ['all', r.age_group]) {
+      const seg = `${r.race}|${g}|${a}`;
+      totals.set(seg, (totals.get(seg) || 0) + 1);
+      const key = `${seg}|${r.origin}`;
+      if (!groups.has(key)) groups.set(key, { key, race: r.race, gender: g, age_group: a, origin: r.origin, origin_type: r.origin_type, riders: 0, times: [] });
+      const o = groups.get(key);
+      o.riders += 1;
+      if (r.status === 'Finished' && r.time_sec != null) o.times.push(Number(r.time_sec));
+    }
+    return [...groups.values()].map(({ times, ...o }) => {
+      const t = times.sort((x, y) => x - y), share = o.riders / totals.get(`${o.race}|${o.gender}|${o.age_group}`);
+      const row = { ...o, share, share_t: (100 * share).toFixed(1) + '%', finishers: t.length };
+      if (t.length) { row.median_sec = q(t, 0.5); row.median_t = hms(row.median_sec); }
+      return row;
+    });
+  },
+});
+
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const GLABEL = { all: 'All riders', F: 'Women', M: 'Men' };
+  const color = (g) => ({ all: dash.colors[2], F: dash.colors[1], M: dash.colors[0] })[g];
+  const hm = (s) => `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}`;
+  const pct = d3.format('.1%');
+  const RLABEL = { '50': '50 mile', '100': '100 mile', '100E': '100 mile elite' };
+  const TABID = { '50': '50-mile', '100': '100-mile', '100E': '100-elite' };
+  const P = () => ({ race: '50', origin_view: 'all', gender: 'all', age_group: 'all', bin: 15, ymode: 'count', ...dash.params() });
+
+  // ---- controls
+  $('.bs-gender').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-g]'); if (!b) return;
+    const g = b.dataset.g, p = P();
+    const seg = dash.data('segments');
+    const exists = seg.status === 'ok' && seg.data.some((r) => r.key === `${p.race}|${g}|${p.age_group}` && r.n > 0);
+    dash.setParams(exists || p.age_group === 'all' ? { gender: g } : { gender: g, age_group: 'all' });
+  });
+  $('.bs-tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-r]'); if (!b) return;
+    const p = P(), r = b.dataset.r, seg = dash.data('segments');
+    const exists = seg.status === 'ok' && seg.data.some((x) => x.key === `${r}|${p.gender}|${p.age_group}` && x.n > 0);
+    dash.setParams(exists || p.age_group === 'all' ? { race: r } : { race: r, age_group: 'all' });
+    dash.setLink(TABID[r]);
+  });
+  $('.bs-oview').addEventListener('click', (e) => { const b = e.target.closest('button[data-o]'); if (b) dash.setParams({ origin_view: b.dataset.o }); });
+  $('.bs-age').addEventListener('change', (e) => dash.setParams({ age_group: e.target.value }));
+  $('.bs-bin').addEventListener('click', (e) => { const b = e.target.closest('button[data-b]'); if (b) dash.setParams({ bin: Number(b.dataset.b) }); });
+  $('.bs-ymode').addEventListener('click', (e) => { const b = e.target.closest('button[data-y]'); if (b) dash.setParams({ ymode: b.dataset.y }); });
+  $('.bs-reset').addEventListener('click', () => dash.resetParams());
+  const toggleAge = (a) => dash.setParams({ age_group: P().age_group === a ? 'all' : a });
+  $('.bs-table tbody').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr[data-key]'); if (!tr) return;
+    toggleAge(tr.dataset.key.split('|')[2]);
+  });
+
+  const tipBox = (box) => {
+    const t = document.createElement('div'); t.className = 'bs-tip'; t.hidden = true; box.appendChild(t);
+    return {
+      show(head, lines, x, y) {
+        t.replaceChildren();
+        const h = document.createElement('div'); h.className = 'bs-tip-head'; h.textContent = head; t.appendChild(h);
+        for (const [sw, txt] of lines) {
+          const l = document.createElement('div'); l.className = 'bs-tip-line';
+          if (sw) { const s = document.createElement('span'); s.className = 'bs-sw'; s.style.background = sw; l.appendChild(s); }
+          l.appendChild(document.createTextNode(txt)); t.appendChild(l);
+        }
+        t.hidden = false;
+        const W = box.clientWidth, tw = t.offsetWidth, th = t.offsetHeight;
+        t.style.left = Math.max(0, Math.min(W - tw, x - tw / 2)) + 'px';
+        t.style.top = Math.max(0, y - th - 10) + 'px';
+      },
+      hide() { t.hidden = true; },
+    };
+  };
+
+  const textWidth = (svg, strs, cls) => {
+    let w = 0;
+    for (const s of strs) {
+      const t = svg.append('text').attr('font-size', 12).text(s);
+      w = Math.max(w, t.node().getComputedTextLength()); t.remove();
+    }
+    return w;
+  };
+
+  const styleAxis = (g) => {
+    g.attr('font-size', null).attr('font-family', null);
+    g.selectAll('.domain').attr('stroke', 'var(--cds-chart-axis)');
+    g.selectAll('.tick line').attr('stroke', 'var(--cds-chart-axis)');
+    g.selectAll('.tick text').attr('fill', 'var(--color-fg-muted)').attr('font-size', 12);
+  };
+
+  const failed = (el) => { el.replaceChildren(); const d = document.createElement('div'); d.className = 'bs-failed'; d.textContent = 'Failed to load'; el.appendChild(d); };
+
+  // ---- histogram
+  function drawHist(el, all, p, segRow) {
+    el.replaceChildren();
+    const W = el.clientWidth || 600, H = W < 520 ? 230 : 290;
+    const bin = Number(p.bin) * 60;
+    all = all.filter((r) => r.race === p.race);
+    const allT = all.filter((r) => r.status === 'Finished' && r.time_sec != null).map((r) => Number(r.time_sec));
+    const segT = all.filter((r) => r.status === 'Finished' && r.time_sec != null
+      && (p.gender === 'all' || r.gender === p.gender) && (p.age_group === 'all' || r.age_group === p.age_group)).map((r) => Number(r.time_sec));
+    if (!segT.length) { const d = document.createElement('div'); d.className = 'bs-empty'; d.textContent = 'No finishers in this group.'; el.appendChild(d); return; }
+    const lo = Math.floor(d3.min(allT) / bin) * bin;
+    let hi = Math.ceil(d3.max(allT) / bin) * bin; if (d3.max(allT) >= hi) hi += bin;
+    const nb = Math.round((hi - lo) / bin);
+    const count = (ts) => { const c = new Array(nb).fill(0); for (const t of ts) c[Math.min(nb - 1, Math.floor((t - lo) / bin))]++; return c; };
+    const c = count(segT), ca = count(allT);
+    const share = p.ymode === 'share';
+    const isAll = p.gender === 'all' && p.age_group === 'all';
+    const val = c.map((v) => share ? v / segT.length : v);
+    const cmp = share && !isAll ? ca.map((v) => v / allT.length) : null;
+    const cum = d3.cumsum(c).map((v) => v / segT.length);
+    const ymax = Math.max(d3.max(val), cmp ? d3.max(cmp) : 0) || 1;
+    const mt = 22, mb = 28, mr = 10;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const y = d3.scaleLinear([0, ymax], [H - mb, mt]).nice();
+    const yt = y.ticks(H < 250 ? 4 : 5).filter((v) => share || Number.isInteger(v));
+    const yfmt = share ? d3.format('.0%') : d3.format(',');
+    const ml = Math.ceil(textWidth(svg, yt.map(yfmt))) + 10;
+    const x = d3.scaleLinear([lo, hi], [ml, W - mr]);
+    svg.append('g').selectAll('line').data(yt).join('line')
+      .attr('x1', ml).attr('x2', W - mr).attr('y1', (d) => y(d)).attr('y2', (d) => y(d)).attr('stroke', 'var(--cds-chart-grid)');
+    svg.append('g').selectAll('text').data(yt).join('text')
+      .attr('x', ml - 8).attr('y', (d) => y(d)).attr('dy', '0.32em').attr('text-anchor', 'end')
+      .attr('fill', 'var(--color-fg-muted)').attr('font-size', 12).text(yfmt);
+    const bw = x(lo + bin) - x(lo), gap = Math.max(1, Math.min(4, bw * 0.15));
+    const col = color(p.gender);
+    const bars = svg.append('g').selectAll('rect').data(d3.range(nb).filter((k) => c[k] > 0)).join('rect')
+      .attr('x', (k) => x(lo + k * bin) + gap / 2).attr('width', Math.max(1, bw - gap))
+      .attr('y', (k) => y(val[k])).attr('height', (k) => Math.max(0, y(0) - y(val[k])))
+      .attr('rx', Math.min(4, (bw - gap) / 2)).attr('fill', col);
+    if (cmp) {
+      const pts = []; cmp.forEach((v, k) => { pts.push([x(lo + k * bin), y(v)], [x(lo + (k + 1) * bin), y(v)]); });
+      svg.append('path').attr('d', d3.line()(pts)).attr('fill', 'none').attr('stroke', 'var(--cds-chart-muted)')
+        .attr('stroke-width', 2).attr('stroke-linejoin', 'round');
+    }
+    const hrs = d3.range(Math.ceil(lo / 3600), Math.floor(hi / 3600) + 1).map((h) => h * 3600);
+    const ax = svg.append('g').attr('transform', `translate(0,${H - mb})`)
+      .call(d3.axisBottom(x).tickValues(hrs).tickFormat(hm).tickSizeOuter(0));
+    styleAxis(ax);
+    if (segRow && segRow.median_sec != null) {
+      const mx = x(segRow.median_sec);
+      svg.append('line').attr('x1', mx).attr('x2', mx).attr('y1', mt - 4).attr('y2', H - mb)
+        .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
+      const lbl = svg.append('text').attr('y', mt - 9).attr('font-size', 12).attr('fill', 'var(--color-fg)')
+        .text(`Median ${segRow.median_t}`);
+      const lw = lbl.node().getComputedTextLength();
+      lbl.attr('x', Math.max(ml, Math.min(W - mr - lw, mx - lw / 2)));
+    }
+    const tip = tipBox(el);
+    svg.append('g').selectAll('rect').data(d3.range(nb)).join('rect')
+      .attr('x', (k) => x(lo + k * bin)).attr('width', bw).attr('y', mt).attr('height', H - mb - mt)
+      .attr('fill', 'transparent')
+      .on('pointerenter pointermove', (ev, k) => {
+        bars.attr('opacity', (j) => (j === k ? 1 : 0.55));
+        const lines = [[col, `${GLABEL[p.gender]}${p.age_group === 'all' ? '' : ' ' + p.age_group}: ${c[k]} rider${c[k] === 1 ? '' : 's'} (${pct(c[k] / segT.length)})`],
+          [null, `Finished by ${hm(lo + (k + 1) * bin)}: ${pct(cum[k])}`]];
+        if (cmp) lines.push(['var(--cds-chart-muted)', `All ${RLABEL[p.race]} finishers: ${pct(cmp[k])}`]);
+        tip.show(`${hm(lo + k * bin)}–${hm(lo + (k + 1) * bin)}`, lines, x(lo + (k + 0.5) * bin), y(Math.max(val[k], cmp ? cmp[k] : 0)));
+      })
+      .on('pointerleave', () => { bars.attr('opacity', 1); tip.hide(); });
+    $('#hist-note').textContent = share
+      ? (isAll ? 'Share of finishers in each time bin.' : 'Share of this group in each time bin; grey line is all finishers, for comparison.')
+      : 'Riders per time bin. Hover or tap a bar for its count and how many had finished by then.';
+  }
+
+  // ---- range chart by age group
+  function drawRanges(el, seg, p) {
+    el.replaceChildren();
+    const series = p.gender === 'all' ? ['F', 'M'] : [p.gender];
+    const leg = $('#range-legend'); leg.replaceChildren();
+    for (const g of series) {
+      const s = document.createElement('span'); const sw = document.createElement('i'); sw.className = 'bs-sw'; sw.style.background = color(g);
+      s.append(sw, document.createTextNode(GLABEL[g])); leg.appendChild(s);
+    }
+    seg = seg.filter((r) => r.race === p.race);
+    const byKey = new Map(seg.map((r) => [`${r.gender}|${r.age_group}`, r]));
+    const rows = GROUPS.filter((a) => series.some((g) => (byKey.get(`${g}|${a}`) || {}).n > 0));
+    const W = el.clientWidth || 600, rowH = series.length > 1 ? 34 : 28, mt = 22, mb = 28, mr = 10;
+    const H = mt + mb + rows.length * rowH;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const ml = Math.ceil(textWidth(svg, rows)) + 14;
+    const fin = seg.filter((r) => r.fastest_sec != null);
+    const lo = Math.floor(d3.min(fin, (r) => r.fastest_sec) / 1800) * 1800, hi = Math.ceil(d3.max(fin, (r) => r.slowest_sec) / 1800) * 1800;
+    const x = d3.scaleLinear([lo, hi], [ml, W - mr]);
+    const hrs = d3.range(Math.ceil(lo / 3600), Math.floor(hi / 3600) + 1).map((h) => h * 3600);
+    svg.append('g').selectAll('line').data(hrs).join('line').attr('x1', x).attr('x2', x).attr('y1', mt).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-grid)');
+    const yc = (i) => mt + i * rowH + rowH / 2;
+    svg.append('g').selectAll('rect').data(rows).join('rect')
+      .attr('x', 0).attr('width', W).attr('y', (a, i) => mt + i * rowH).attr('height', rowH)
+      .attr('rx', 4).attr('fill', (a) => (a === p.age_group ? 'var(--cds-chart-grid)' : 'transparent'));
+    svg.append('g').selectAll('text').data(rows).join('text')
+      .attr('x', 0).attr('y', (a, i) => yc(i)).attr('dy', '0.32em').attr('font-size', 12)
+      .attr('font-weight', (a) => (a === p.age_group ? 600 : 400))
+      .attr('fill', (a) => (a === p.age_group ? 'var(--color-fg)' : 'var(--color-fg-muted)')).text((a) => a);
+    const field = byKey.get('all|all');
+    if (field && field.median_sec != null) {
+      const fx = x(field.median_sec);
+      svg.append('line').attr('x1', fx).attr('x2', fx).attr('y1', mt - 4).attr('y2', H - mb)
+        .attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
+      const t = svg.append('text').attr('y', mt - 9).attr('font-size', 12).attr('fill', 'var(--color-fg-muted)').text(`Field median ${field.median_t}`);
+      const tw = t.node().getComputedTextLength(); t.attr('x', Math.max(ml, Math.min(W - mr - tw, fx - tw / 2)));
+    }
+    rows.forEach((a, i) => {
+      series.forEach((g, j) => {
+        const r = byKey.get(`${g}|${a}`); if (!r || !r.n) return;
+        const cy = yc(i) + (series.length > 1 ? (j === 0 ? -6 : 6) : 0), cl = color(g);
+        svg.append('line').attr('x1', x(r.fastest_sec)).attr('x2', x(r.slowest_sec)).attr('y1', cy).attr('y2', cy)
+          .attr('stroke', cl).attr('stroke-opacity', 0.5).attr('stroke-width', 1.5).attr('stroke-linecap', 'round');
+        svg.append('rect').attr('x', x(r.p25_sec)).attr('width', Math.max(2, x(r.p75_sec) - x(r.p25_sec)))
+          .attr('y', cy - 4).attr('height', 8).attr('rx', 4).attr('fill', cl).attr('fill-opacity', 0.4);
+        svg.append('circle').attr('cx', x(r.median_sec)).attr('cy', cy).attr('r', 5).attr('fill', cl)
+          .attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5);
+      });
+    });
+    const ax = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).tickValues(hrs).tickFormat(hm).tickSizeOuter(0));
+    styleAxis(ax);
+    const tip = tipBox(el);
+    svg.append('g').selectAll('rect').data(rows).join('rect').attr('class', 'bs-hit')
+      .attr('x', 0).attr('width', W).attr('y', (a, i) => mt + i * rowH).attr('height', rowH).attr('fill', 'transparent')
+      .on('pointerenter pointermove', (ev, a) => {
+        const i = rows.indexOf(a);
+        const lines = series.map((g) => {
+          const r = byKey.get(`${g}|${a}`);
+          return [color(g), r && r.n ? `${GLABEL[g]}: ${r.n} finishers, median ${r.median_t}, middle half ${hm(r.p25_sec)}–${hm(r.p75_sec)}` : `${GLABEL[g]}: no finishers`];
+        });
+        const [mx] = d3.pointer(ev, el);
+        tip.show(a, lines, mx, mt + i * rowH);
+      })
+      .on('pointerleave', () => tip.hide())
+      .on('click', (ev, a) => toggleAge(a));
+  }
+
+  // ---- table
+  function drawTable(seg, p) {
+    const tb = $('.bs-table tbody'); tb.replaceChildren();
+    $('#table-title').textContent = `${RLABEL[p.race]} finish times by age group: ${GLABEL[p.gender].toLowerCase()}`;
+    const rows = seg.filter((r) => r.race === p.race && r.gender === p.gender)
+      .sort((a, b) => (a.age_group === 'all' ? -1 : b.age_group === 'all' ? 1 : GROUPS.indexOf(a.age_group) - GROUPS.indexOf(b.age_group)));
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.key;
+      if (r.age_group === 'all') tr.classList.add('is-total');
+      if (r.age_group === p.age_group && r.age_group !== 'all') tr.classList.add('is-picked');
+      for (const v of [r.group_label, r.n, r.dnf, r.fastest_t, r.p25_t, r.median_t, r.p75_t, r.slowest_t]) {
+        const td = document.createElement('td'); td.textContent = v == null ? '—' : String(v); tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  }
+
+  function drawOrigins(orig, p, segRow) {
+    const tb = $('.bs-otable tbody'); tb.replaceChildren();
+    const rows = orig.filter((r) => r.race === p.race && r.gender === p.gender && r.age_group === p.age_group
+      && (p.origin_view === 'all' || r.origin_type === p.origin_view))
+      .sort((a, b) => b.riders - a.riders || a.origin.localeCompare(b.origin));
+    $('#origin-empty').hidden = rows.length > 0;
+    const max = d3.max(rows, (r) => r.share) || 1;
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.key;
+      const name = document.createElement('td'); name.textContent = r.origin;
+      if (r.origin_type !== 'US') name.className = 'bs-intl';
+      tr.appendChild(name);
+      const td = (v) => { const c = document.createElement('td'); c.textContent = v == null ? '—' : String(v); tr.appendChild(c); };
+      td(r.riders);
+      const sc = document.createElement('td'); const wrap = document.createElement('div'); wrap.className = 'bs-barcell';
+      const bar = document.createElement('i'); bar.className = 'bs-bar';
+      bar.style.width = Math.max(2, Math.round(72 * r.share / max)) + 'px';
+      bar.style.background = r.origin_type === 'US' ? color(p.gender) : 'var(--cds-chart-muted)';
+      const lab = document.createElement('span'); lab.textContent = r.share_t;
+      wrap.append(bar, lab); sc.appendChild(wrap); tr.appendChild(sc);
+      td(r.finishers); td(r.median_t);
+      tb.appendChild(tr);
+    }
+  }
+
+  const MARKS = ['lede-n', 'lede-med', 'lede-p25', 'lede-p75', 'lede-gapt', 'lede-gapd', 'k-n', 'k-start', 'k-fast', 'k-slow', 'k-med', 'k-mean', 'k-iqr', 'k-p25', 'k-p75', 'k-dnfr', 'k-dnf', 'o-states', 'o-countries', 'o-intl', 'o-intlsh', 'o-top', 'o-topsh'];
+
+  dash.onData(() => {
+    const p = P();
+    const res = dash.data('results'), seg = dash.data('segments'), orig = dash.data('origins');
+    for (const b of document.querySelectorAll('.bs-tabs button')) b.setAttribute('aria-selected', String(b.dataset.r === p.race));
+    for (const b of document.querySelectorAll('.bs-gender button')) b.setAttribute('aria-pressed', String(b.dataset.g === p.gender));
+    for (const b of document.querySelectorAll('.bs-bin button')) b.setAttribute('aria-pressed', String(Number(b.dataset.b) === Number(p.bin)));
+    for (const b of document.querySelectorAll('.bs-oview button')) b.setAttribute('aria-pressed', String(b.dataset.o === p.origin_view));
+    for (const b of document.querySelectorAll('.bs-ymode button')) b.setAttribute('aria-pressed', String(b.dataset.y === p.ymode));
+    const segName = RLABEL[p.race] + ', ' + GLABEL[p.gender].toLowerCase() + (p.age_group === 'all' ? '' : `, ${p.age_group}`);
+    document.querySelector('.bs-seg-name').textContent = segName;
+
+    const hist = $('#hist-chart'), range = $('#range-chart');
+    if (seg.status !== 'ok' || res.status !== 'ok' || orig.status !== 'ok') {
+      const bad = seg.status === 'error' || res.status === 'error' || orig.status === 'error';
+      if (bad) { hist.classList.remove('dash-skeleton'); range.classList.remove('dash-skeleton'); failed(hist); failed(range); }
+      for (const id of MARKS) { const e = document.getElementById(id); e.textContent = '—'; if (bad) e.classList.remove('dash-skeleton'); }
+      return;
+    }
+    const rows = seg.data;
+    // age select
+    const sel = $('.bs-age');
+    const opts = [new Option('All ages', 'all')];
+    for (const a of GROUPS) {
+      const all = rows.find((r) => r.key === `${p.race}|all|${a}`); if (!all) continue;
+      const mine = rows.find((r) => r.key === `${p.race}|${p.gender}|${a}`);
+      const o = new Option(mine && mine.n ? `${a}  (${mine.n})` : `${a}  (none)`, a);
+      if (!(mine && mine.n)) o.disabled = true;
+      opts.push(o);
+    }
+    sel.replaceChildren(...opts); sel.value = p.age_group;
+
+    const key = `${p.race}|${p.gender}|${p.age_group}`;
+    const r = rows.find((x) => x.key === key) || {};
+    for (const id of MARKS) {
+      const e = document.getElementById(id);
+      e.setAttribute('data-where', `key=${key}`);
+      e.classList.remove('dash-skeleton');
+      const v = r[e.dataset.field];
+      e.textContent = v == null ? '—' : String(v);
+    }
+    $('#o-states-word').textContent = r.n_states === 1 ? 'state' : 'states';
+    $('#o-countries-word').textContent = r.n_countries === 1 ? 'other country' : 'other countries';
+    $('#o-intl-wrap').hidden = !r.intl;
+    $('#lede-gap').hidden = (p.gender === 'all' && p.age_group === 'all') || r.median_gap_t == null;
+
+    hist.classList.remove('dash-skeleton'); range.classList.remove('dash-skeleton');
+    drawHist(hist, res.data, p, r);
+    drawRanges(range, rows, p);
+    drawTable(rows, p);
+    drawOrigins(orig.data, p, r);
+  });
+
+  const hash = location.hash.slice(1);
+  const fromTab = Object.keys(TABID).find((r) => TABID[r] === hash);
+  if (fromTab) dash.setParams({ race: fromTab });
+  else { const named = document.getElementById(hash); if (named) named.scrollIntoView(); }
+})();
+</script>
+
+<footer class="site-foot">
+  Results from Athlinks (2026 Life Time Big Sugar Gravel, event 1144157), 1,916 starters. Rider names are left out.
+  The underlying data is in <a href="data/big_sugar_results.csv">data/big_sugar_results.csv</a>.
+</footer>
+</main>
+</body>
+</html>
